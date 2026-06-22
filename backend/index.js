@@ -70,6 +70,7 @@ async function initDb() {
             { type: 'text', text: 'Sustainable energy is crucial for our planet.' },
             { type: 'image', path: '/app/uploads/space.png' },
             { type: 'image', path: '/app/uploads/nature.png' },
+            { type: 'audio', path: '/app/uploads/audio_seed.wav' },
         ];
 
         for (const item of seedItems) {
@@ -80,8 +81,14 @@ async function initDb() {
                     'INSERT INTO items (type, text_content, embedding) VALUES ($1, $2, $3)',
                     [item.type, item.text, `[${embedding.join(',')}]`]
                 );
-            } else {
+            } else if (item.type === 'image') {
                 embedding = await getEmbedding('image', item.path);
+                await pool.query(
+                    'INSERT INTO items (type, content_path, embedding) VALUES ($1, $2, $3)',
+                    [item.type, `/uploads/${path.basename(item.path)}`, `[${embedding.join(',')}]`]
+                );
+            } else if (item.type === 'audio') {
+                embedding = await getEmbedding('audio', item.path);
                 await pool.query(
                     'INSERT INTO items (type, content_path, embedding) VALUES ($1, $2, $3)',
                     [item.type, `/uploads/${path.basename(item.path)}`, `[${embedding.join(',')}]`]
