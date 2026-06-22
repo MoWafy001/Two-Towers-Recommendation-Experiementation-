@@ -194,6 +194,29 @@ app.get('/recommendations/:userId', async (req, res) => {
     res.json(result.rows);
 });
 
+app.get('/user/:userId', async (req, res) => {
+    const { userId } = req.params;
+    const userRes = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+    const user = userRes.rows[0];
+
+    if (!user) return res.status(404).send('User not found');
+
+    // Get modality affinity
+    const interactions = await pool.query(`
+    SELECT i.type, COUNT(*) as count
+    FROM interactions int
+    JOIN items i ON int.item_id = i.id
+    WHERE int.user_id = $1
+    GROUP BY i.type
+  `, [userId]);
+
+    res.json({
+        ...user,
+        embedding: user.embedding ? JSON.parse(user.embedding.replace('[', '[').replace(']', ']')) : null,
+        stats: interactions.rows
+    });
+});
+
 app.listen(port, () => {
     console.log(`Backend listening at http://localhost:${port}`);
 });

@@ -60,14 +60,24 @@ def download_models():
             raise
 
 # Ensure models are downloaded before loading
+print("Starting model download check...")
 download_models()
+print("Model download check complete.")
 
-# Load models
+# Load models into memory
+print("Loading CLIP model into memory...")
 clip_model = CLIPModel.from_pretrained("/models/clip")
 clip_processor = CLIPProcessor.from_pretrained("/models/clip")
+print("CLIP model loaded successfully.")
 
+print("Loading CLAP model into memory...")
 clap_model = ClapModel.from_pretrained("/models/clap")
 clap_processor = AutoProcessor.from_pretrained("/models/clap")
+print("CLAP model loaded successfully.")
+
+@app.on_event("startup")
+async def startup_event():
+    print("Inference service is starting up and ready to serve requests.")
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 clip_model.to(device)
