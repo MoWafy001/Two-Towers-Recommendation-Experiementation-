@@ -187,7 +187,7 @@ app.get('/recommendations/:userId', async (req, res) => {
     const result = await pool.query(`
     SELECT *, (embedding <=> $1) as distance 
     FROM items 
-    ORDER BY distance + (random() * 0.2) 
+    ORDER BY (embedding <=> $1) + (random() * 0.2) 
     LIMIT 10
   `, [userEmbedding]);
 
