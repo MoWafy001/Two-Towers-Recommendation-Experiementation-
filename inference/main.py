@@ -17,13 +17,11 @@ def download_models():
     clip_path = os.path.join(models_dir, "clip")
     clap_path = os.path.join(models_dir, "clap")
 
-    # Helper to check if model files exist
-    def is_valid(path):
-        if not os.path.exists(path): return False
-        files = os.listdir(path)
-        return any(f.endswith(('.bin', '.safetensors')) for f in files)
+    # Helper to check if model is fully downloaded
+    def is_fully_downloaded(path):
+        return os.path.exists(os.path.join(path, ".success"))
 
-    if not is_valid(clip_path):
+    if not is_fully_downloaded(clip_path):
         if os.path.exists(clip_path): shutil.rmtree(clip_path)
         os.makedirs(clip_path, exist_ok=True)
         print(f"Downloading CLIP model to {clip_path}...")
@@ -33,13 +31,16 @@ def download_models():
             processor = CLIPProcessor.from_pretrained(model_name)
             model.save_pretrained(clip_path)
             processor.save_pretrained(clip_path)
+            # Create success marker
+            with open(os.path.join(clip_path, ".success"), "w") as f:
+                f.write("done")
             print("CLIP model downloaded successfully.")
         except Exception as e:
             print(f"Error downloading CLIP: {e}")
-            shutil.rmtree(clip_path)
+            if os.path.exists(clip_path): shutil.rmtree(clip_path)
             raise
     
-    if not is_valid(clap_path):
+    if not is_fully_downloaded(clap_path):
         if os.path.exists(clap_path): shutil.rmtree(clap_path)
         os.makedirs(clap_path, exist_ok=True)
         print(f"Downloading CLAP model to {clap_path}...")
@@ -49,10 +50,13 @@ def download_models():
             processor = AutoProcessor.from_pretrained(model_name)
             model.save_pretrained(clap_path)
             processor.save_pretrained(clap_path)
+            # Create success marker
+            with open(os.path.join(clap_path, ".success"), "w") as f:
+                f.write("done")
             print("CLAP model downloaded successfully.")
         except Exception as e:
             print(f"Error downloading CLAP: {e}")
-            shutil.rmtree(clap_path)
+            if os.path.exists(clap_path): shutil.rmtree(clap_path)
             raise
 
 # Ensure models are downloaded before loading
