@@ -64,11 +64,42 @@ async function initDb() {
     if (parseInt(countRes.rows[0].count) === 0) {
         console.log('Seeding initial data...');
         const seedItems = [
+            // Technology & AI
             { type: 'text', text: 'The future of AI is multi-modal and agentic.' },
+            { type: 'text', text: 'Large Language Models are transforming how we interact with computers.' },
+            { type: 'text', text: 'Neural networks are inspired by the human brain structure.' },
+
+            // Space & Science
             { type: 'text', text: 'Space exploration is the next frontier for humanity.' },
-            { type: 'text', text: 'Sustainable energy is crucial for our planet.' },
+            { type: 'text', text: 'The James Webb Telescope is revealing the early universe.' },
+            { type: 'text', text: 'Mars colonization presents unique engineering challenges.' },
             { type: 'image', path: '/app/uploads/space.png' },
+
+            // Nature & Environment
+            { type: 'text', text: 'Sustainable energy is crucial for our planet.' },
+            { type: 'text', text: 'Biodiversity is essential for a healthy ecosystem.' },
+            { type: 'text', text: 'Climate change requires global cooperation and innovation.' },
             { type: 'image', path: '/app/uploads/nature.png' },
+
+            // Food & Cooking
+            { type: 'text', text: 'Mediterranean diet is known for its health benefits.' },
+            { type: 'text', text: 'The art of sourdough baking requires patience and precision.' },
+            { type: 'text', text: 'Spices are the soul of global cuisines.' },
+            { type: 'image', path: '/app/uploads/food.png' },
+
+            // Fitness & Health
+            { type: 'text', text: 'High-intensity interval training is effective for fat loss.' },
+            { type: 'text', text: 'Mental health is just as important as physical health.' },
+            { type: 'text', text: 'Yoga improves flexibility and reduces stress.' },
+            { type: 'image', path: '/app/uploads/fitness.png' },
+
+            // Music & Art
+            { type: 'text', text: 'Classical music has a profound impact on cognitive function.' },
+            { type: 'text', text: 'Street art is a powerful medium for social commentary.' },
+            { type: 'text', text: 'Jazz improvisation is a conversation between musicians.' },
+            { type: 'image', path: '/app/uploads/music.png' },
+
+            // Audio
             { type: 'audio', path: '/app/uploads/audio_seed.wav' },
         ];
 
