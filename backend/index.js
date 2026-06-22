@@ -178,7 +178,11 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 
 app.get('/items', async (req, res) => {
     const result = await pool.query('SELECT * FROM items');
-    res.json(result.rows);
+    const items = result.rows.map(row => ({
+        ...row,
+        embedding: row.embedding ? JSON.parse(row.embedding.replace('[', '[').replace(']', ']')) : null
+    }));
+    res.json(items);
 });
 
 app.post('/interact', async (req, res) => {
@@ -186,19 +190,33 @@ app.post('/interact', async (req, res) => {
     await pool.query('INSERT INTO interactions (user_id, item_id, type) VALUES ($1, $2, $3)', [userId, itemId, type]);
 
     // Update user embedding (Two-Tower logic)
-    // Simple: average of embeddings of items interacted with
     const interactions = await pool.query(`
-    SELECT i.embedding 
+    SELECT i.embedding, int.type 
     FROM items i 
     JOIN interactions int ON i.id = int.item_id 
     WHERE int.user_id = $1
   `, [userId]);
 
     if (interactions.rows.length > 0) {
-        const embeddings = interactions.rows.map(r => JSON.parse(r.embedding.replace('[', '[').replace(']', ']')));
-        const avgEmbedding = embeddings[0].map((_, i) => embeddings.reduce((acc, e) => acc + e[i], 0) / embeddings.length);
+        let userVec = new Array(512).fill(0);
+        let totalWeight = 0;
 
-        await pool.query('UPDATE users SET embedding = $1 WHERE id = $2', [`[${avgEmbedding.join(',')}]`, userId]);
+        for (const row of interactions.rows) {
+            const vec = JSON.parse(row.embedding.replace('[', '[').replace(']', ']'));
+            const weight = row.type === 'like' ? 1.0 : -0.5; // Dislikes push away
+            for (let i = 0; i < 512; i++) {
+                userVec[i] += vec[i] * weight;
+            }
+            totalWeight += Math.abs(weight);
+        }
+
+        // Normalize
+        const magnitude = Math.sqrt(userVec.reduce((acc, val) => acc + val * val, 0));
+        if (magnitude > 0) {
+            userVec = userVec.map(v => v / magnitude);
+        }
+
+        await pool.query('UPDATE users SET embedding = $1 WHERE id = $2', [`[${userVec.join(',')}]`, userId]);
     }
 
     res.send('Interaction recorded');
@@ -218,11 +236,16 @@ app.get('/recommendations/:userId', async (req, res) => {
     const result = await pool.query(`
     SELECT *, (embedding <=> $1) as distance 
     FROM items 
-    ORDER BY (embedding <=> $1) + (random() * 0.2) 
+    ORDER BY (embedding <=> $1) + (random() * 0.1) 
     LIMIT 10
   `, [userEmbedding]);
 
-    res.json(result.rows);
+    const recs = result.rows.map(row => ({
+        ...row,
+        embedding: row.embedding ? JSON.parse(row.embedding.replace('[', '[').replace(']', ']')) : null
+    }));
+
+    res.json(recs);
 });
 
 app.get('/user/:userId', async (req, res) => {
