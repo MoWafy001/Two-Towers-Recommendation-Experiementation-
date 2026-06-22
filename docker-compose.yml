@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  db:
+    image: ankane/pgvector
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: recommendation_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  inference:
+    build: ./inference
+    volumes:
+      - ./models:/models
+    ports:
+      - "8000:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 0 # Change to 1 if you have GPU
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    environment:
+      DB_HOST: db
+      INFERENCE_URL: http://inference:8000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data/uploads:/app/uploads
+    depends_on:
+      - db
+      - inference
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
