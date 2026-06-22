@@ -1,5 +1,8 @@
 # Multi-Modal Two-Tower Recommendation System PoC
 
+<img width="1080" height="641" alt="image" src="https://github.com/user-attachments/assets/f8c1a85a-0e9a-4d62-959d-f546ea7e13c8" />
+
+
 A proof of concept for a recommendation system handling text, images, and audio using a Two-Tower architecture and local pretrained models.
 
 ## Core Concepts
