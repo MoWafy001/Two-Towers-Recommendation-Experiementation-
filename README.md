@@ -71,5 +71,6 @@ Go to [http://localhost:5173](http://localhost:5173).
 - `/frontend`: React UI.
 - `/inference`: Python service running the AI models.
 - `/scripts`: Utility scripts for setup.
-- `/models`: (Created after download) Stores the AI model files.
-- `/data`: Stores uploaded files.
+- `/models`: Stores the AI model files (automatically created).
+- `/data/postgres`: Stores the database files (automatically created).
+- `/data/uploads`: Stores uploaded images and audio files.

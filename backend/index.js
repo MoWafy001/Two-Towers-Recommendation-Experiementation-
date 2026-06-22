@@ -58,6 +58,7 @@ async function initDb() {
 
     // Create a default user if not exists
     await pool.qury('INSERT INTO users (username) VALUES ($1) ON CONFLICT DO NOTHING', ['default_user']);
+    await pool.query('INSERT INTO users (username) VALUES ($1) ON CONFLICT DO NOTHING', ['default_user']);
 
     // Seed initial data if empty
     const countRes = await pool.query('SELECT COUNT(*) FROM items');
@@ -67,14 +68,25 @@ async function initDb() {
             { type: 'text', text: 'The future of AI is multi-modal and agentic.' },
             { type: 'text', text: 'Space exploration is the next frontier for humanity.' },
             { type: 'text', text: 'Sustainable energy is crucial for our planet.' },
+            { type: 'image', path: '/app/uploads/space.png' },
+            { type: 'image', path: '/app/uploads/nature.png' },
         ];
 
         for (const item of seedItems) {
-            const embedding = await getEmbedding('text', item.text);
-            await pool.query(
-                'INSERT INTO items (type, text_content, embedding) VALUES ($1, $2, $3)',
-                [item.type, item.text, `[${embedding.join(',')}]`]
-            );
+            let embedding;
+            if (item.type === 'text') {
+                embedding = await getEmbedding('text', item.text);
+                await pool.query(
+                    'INSERT INTO items (type, text_content, embedding) VALUES ($1, $2, $3)',
+                    [item.type, item.text, `[${embedding.join(',')}]`]
+                );
+            } else {
+                embedding = await getEmbedding('image', item.path);
+                await pool.query(
+                    'INSERT INTO items (type, content_path, embedding) VALUES ($1, $2, $3)',
+                    [item.type, `/uploads/${path.basename(item.path)}`, `[${embedding.join(',')}]`]
+                );
+            }
         }
         console.log('Seeding complete.');
     }

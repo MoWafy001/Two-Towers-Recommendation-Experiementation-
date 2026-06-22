@@ -10,7 +10,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql/data
 
   inference:
     build: ./inference
@@ -49,6 +49,3 @@ services:
       - "5173:5173"
     depends_on:
       - backend
-
-volumes:
-  pgdata:
