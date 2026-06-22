@@ -9,7 +9,7 @@ const fs = require('fs');
 const app = express();
 const port = 3000;
 
-app.use(cors());
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use('/uploads', express.static('/app/uploads'));
 
