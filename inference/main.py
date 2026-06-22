@@ -15,21 +15,27 @@ def download_models():
     clip_path = os.path.join(models_dir, "clip")
     clap_path = os.path.join(models_dir, "clap")
 
-    if not os.path.exists(clip_path):
-        print("Downloading CLIP model...")
+    # Check if clip directory is empty or doesn't exist
+    if not os.path.exists(clip_path) or not os.listdir(clip_path):
+        os.makedirs(clip_path, exist_ok=True)
+        print(f"Downloading CLIP model to {clip_path}...")
         model_name = 'openai/clip-vit-base-patch32'
         model = CLIPModel.from_pretrained(model_name)
         processor = CLIPProcessor.from_pretrained(model_name)
         model.save_pretrained(clip_path)
         processor.save_pretrained(clip_path)
+        print("CLIP model downloaded successfully.")
     
-    if not os.path.exists(clap_path):
-        print("Downloading CLAP model...")
+    # Check if clap directory is empty or doesn't exist
+    if not os.path.exists(clap_path) or not os.listdir(clap_path):
+        os.makedirs(clap_path, exist_ok=True)
+        print(f"Downloading CLAP model to {clap_path}...")
         model_name = 'laion/clap-htsat-unfused'
         model = ClapModel.from_pretrained(model_name)
         processor = AutoProcessor.from_pretrained(model_name)
         model.save_pretrained(clap_path)
         processor.save_pretrained(clap_path)
+        print("CLAP model downloaded successfully.")
 
 # Ensure models are downloaded before loading
 download_models()

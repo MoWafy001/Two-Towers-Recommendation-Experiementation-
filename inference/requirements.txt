@@ -6,3 +6,4 @@ python-multipart
 librosa
 numpy
 soundfile
+typing-extensions>=4.10.0
