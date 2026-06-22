@@ -57,7 +57,7 @@ async function initDb() {
   `);
 
     // Create a default user if not exists
-    await pool.query('INSERT INTO users (username) VALUES ($1) ON CONFLICT DO NOTHING', ['default_user']);
+    await pool.qury('INSERT INTO users (username) VALUES ($1) ON CONFLICT DO NOTHING', ['default_user']);
 
     // Seed initial data if empty
     const countRes = await pool.query('SELECT COUNT(*) FROM items');

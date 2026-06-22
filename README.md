@@ -50,19 +50,14 @@ The system is split into four main parts:
 
 ## 🚀 Getting Started
 
-### 1. Download Models
-The AI models are large, so they aren't included in the code. Run this script to download them to your local machine:
-```bash
-bash scripts/download_models.sh
-```
-
-### 2. Run with Docker
+### 1. Run with Docker
 Everything is automated. Just run:
 ```bash
 docker compose up --build
 ```
+*Note: The first run will take some time as it downloads the AI models (~1.2GB total). These will be saved in the `models/` folder in your project directory so you can see them.*
 
-### 3. Explore
+### 2. Explore
 Go to [http://localhost:5173](http://localhost:5173).
 - Like some items.
 - Refresh the recommendations.

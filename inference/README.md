@@ -19,8 +19,6 @@ We use two state-of-the-art models from Hugging Face:
 - `POST /embed/text`: Takes a string of text, returns a 512-number vector.
 - `POST /embed/audio`: Takes an audio file, returns a 512-number vector.
 
-## 🛠️ Tech Stack
-- **FastAPI**: High-performance Python web framework.
-- **PyTorch**: The engine running the AI models.
-- **Transformers (Hugging Face)**: Library to easily load and use pretrained models.
-- **Librosa**: For processing audio files.
+## 📥 Automated Setup
+
+The models are automatically downloaded when the service starts for the first time. They are stored in the `models/` directory in the project root via a Docker bind mount.
