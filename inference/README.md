@@ -1,24 +1,34 @@
 # Inference Service
 
-This is a Python FastAPI service that wraps the "intelligence" of the system. It uses pretrained AI models to turn raw data into mathematical vectors (embeddings).
+Python FastAPI service for generating embeddings using pretrained models.
 
-## 🤖 The Models
+## Models
 
-We use two state-of-the-art models from Hugging Face:
+- **CLIP**: `openai/clip-vit-base-patch32` for text and images.
+- **CLAP**: `laion/clap-htsat-unfused` for audio.
 
-1.  **CLIP (Contrastive Language-Image Pre-training)**:
-    - **Used for**: Text and Images.
-    - **How it works**: CLIP was trained on millions of images and their captions. It learned to map images and text into the *same* vector space. This means a picture of a dog and the word "dog" will have very similar embeddings.
-2.  **CLAP (Contrastive Language-Audio Pre-training)**:
-    - **Used for**: Audio.
-    - **How it works**: Similar to CLIP, but for audio. It maps sounds and text descriptions into the same space.
+## API Endpoints
 
-## 🛣️ Endpoints
+### Image Embedding
+`POST /embed/image`
+- Input: Multipart file
+- Output: `{"embedding": [0.1, 0.2, ...]}`
 
-- `POST /embed/image`: Takes an image file, returns a 512-number vector.
-- `POST /embed/text`: Takes a string of text, returns a 512-number vector.
-- `POST /embed/audio`: Takes an audio file, returns a 512-number vector.
+### Text Embedding
+`POST /embed/text`
+- Input: Form data `text`
+- Output: `{"embedding": [0.1, 0.2, ...]}`
 
-## 📥 Automated Setup
+### Audio Embedding
+`POST /embed/audio`
+- Input: Multipart file
+- Output: `{"embedding": [0.1, 0.2, ...]}`
 
-The models are automatically downloaded when the service starts for the first time. They are stored in the `models/` directory in the project root via a Docker bind mount.
+## Implementation Example (Python)
+```python
+# CLIP Inference
+inputs = clip_processor(images=image, return_tensors="pt")
+with torch.no_grad():
+    image_features = clip_model.get_image_features(**inputs)
+embedding = image_features.cpu().numpy().tolist()[0]
+```
